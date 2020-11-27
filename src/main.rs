@@ -15,7 +15,7 @@ fn main() {
         (@arg daemon: -d --daemon "daemonize")
         (@arg log: -l --log +takes_value "log file path")
         (@arg pid: -p --pid +takes_value "pid file path")
-        (@arg mountpoint: "mountpoint")
+        (@arg mountpoint: +required "mountpoint")
         (@arg scanner: "scanner")
     )
     .get_matches();
