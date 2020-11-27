@@ -14,6 +14,7 @@ fn main() {
         (author:        crate_authors!())
         (version:       crate_version!())
         (@arg daemon: -d --daemon "daemonize")
+        (@arg verbose: -v --verbose "verbose")
         (@arg log: -l --log +takes_value "log file path")
         (@arg pid: -p --pid +takes_value "pid file path")
         (@arg mountpoint: +required "mountpoint")
@@ -67,9 +68,10 @@ fn main() {
     loop {
         let poll_num = poll(&mut fds, -1).unwrap();
         if poll_num > 0 {
-            assert!(fds[0].revents().unwrap().contains(PollFlags::POLLIN));
             for event in fd.read_event() {
-                println!("{:#?}", event);
+                if app.is_present("verbose") {
+                    println!("{:#?}", event);
+                }
                 if event.events.contains(&FanEvent::OpenExecPerm) {
                     let mut response = FanotifyResponse::Allow;
                     if let Some(scanner) = app.value_of("scanner") {
