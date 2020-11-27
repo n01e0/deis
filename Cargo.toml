@@ -1,0 +1,20 @@
+[package]
+name = "deis"
+version = "0.1.0"
+authors = ["n01e0 <reoshiseki@gmail.com>"]
+edition = "2018"
+description = """
+deis is Detect Execute and Insert Scan.
+Uses fanotify to detect the execution of files in the target mountpoint and performs a scan.
+Depending on the result of the scan, it can be disallowed to run.
+"""
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = "2.33.3"
+daemonize = "0.4.1"
+env_logger = "0.8.2"
+fanotify-rs = { git = "https://github.com/n01e0/fanotify-rs" }
+log = "0.4.11"
+nix = "0.19.0"
