@@ -6,6 +6,7 @@ use fanotify::high_level::*;
 use nix::poll::{poll, PollFd, PollFlags};
 use std::fs::OpenOptions;
 use std::process::Command;
+use which::which;
 
 fn main() {
     let app = clap_app!(deis =>
@@ -72,15 +73,21 @@ fn main() {
                 if event.events.contains(&FanEvent::OpenExecPerm) {
                     let mut response = FanotifyResponse::Allow;
                     if let Some(scanner) = app.value_of("scanner") {
-                        if Command::new(scanner)
-                            .arg(event.path)
-                            .status()
-                            .unwrap()
-                            .code()
-                            .unwrap()
-                            != 0
-                        {
-                            response = FanotifyResponse::Deny;
+                        let scanner = which(scanner).unwrap_or_else(|e| {
+                            eprintln!("{}", e);
+                            std::process::exit(1);
+                        });
+                        if event.path != scanner.to_str().unwrap() {
+                            if Command::new(scanner)
+                                .arg(event.path)
+                                .status()
+                                .unwrap()
+                                .code()
+                                .unwrap()
+                                != 0
+                            {
+                                response = FanotifyResponse::Deny;
+                            }
                         }
                     }
                     fd.send_response(event.fd, response);
